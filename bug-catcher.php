@@ -39,7 +39,6 @@ class BugCatcherPlugin extends Plugin
         foreach ($this->getConfigHandlers(static::GRAV_EMAIL_HANDLERS_KEY) as $config) {
             $this->addHandler($this->getGravEmailHandler($this->grav['Email'], $config), $config);
         }
-
         // Slack handlers
         foreach ($this->getConfigHandlers(static::SLACK_HANDLERS_KEY) as $config) {
             $this->addHandler($this->getSlackHandler($config), $config);
@@ -53,7 +52,9 @@ class BugCatcherPlugin extends Plugin
      */
     private function getConfigHandlers($handlersKey)
     {
-        $handlersConfigs = $this->grav['config']->get('plugins.bug-catcher.' . $handlersKey);
+        if (!($handlersConfigs = $this->grav['config']->get('plugins.bug-catcher.' . $handlersKey))) {
+            return [];
+        }
         return array_filter($handlersConfigs, function ($config) {
             return !(isset($config['enabled']) && false === (boolean)$config['enabled']);
         });
