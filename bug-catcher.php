@@ -87,7 +87,9 @@ class BugCatcherPlugin extends Plugin
             return $emailer->send($emailer
                 ->message(
                     $emailConfig['subject'],
-                    (new PrettyHtmlFormatter)->format($record),
+                    (new PrettyHtmlFormatter)
+                        ->setTwigEnvironment($this->grav['twig']->twig)
+                        ->format($record),
                     'text/html'
                 )
                 ->setFrom($emailConfig['from'])
