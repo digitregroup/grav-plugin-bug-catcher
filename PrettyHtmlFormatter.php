@@ -17,7 +17,7 @@ class PrettyHtmlFormatter extends \Monolog\Formatter\HtmlFormatter
      */
     public function format(array $record)
     {
-        return $this->renderTwigString('email.twig', [
+        return $this->renderTwigTemplate('email.twig', [
             'level'      => $this->addTitle($record['level_name'], $record['level']),
             'title'      => substr($record['message'], 0, strpos($record['message'], ' - Trace:')),
             'context'    => $this->formatExtra($record, 'context'),
@@ -28,22 +28,24 @@ class PrettyHtmlFormatter extends \Monolog\Formatter\HtmlFormatter
     }
 
     /**
-     * @param $templateString
+     * Renders a Twig template
+     * @param $templatePath
      * @param array $data
      * @return string
      * @throws \Twig_Error_Loader
      * @throws \Twig_Error_Runtime
      * @throws \Twig_Error_Syntax
      */
-    private function renderTwigString($templateString, $data = [])
+    private function renderTwigTemplate($templatePath, $data = [])
     {
         if (null === $this->twig) {
+            // Use generic Twig environment if Grav's Twig environment has not been set
             $this->twig = new \Twig_Environment(
                 new \Twig_Loader_Filesystem(__DIR__ . '/twig'),
                 ['autoescape' => false]
             );
         }
-        return $this->twig->render($templateString, $data);
+        return $this->twig->render($templatePath, $data);
     }
 
     /**
@@ -69,7 +71,7 @@ class PrettyHtmlFormatter extends \Monolog\Formatter\HtmlFormatter
             array_values($record[$recordKey])
         );
 
-        return $this->renderTwigString('extra.twig', ['rows' => $rows]);
+        return $this->renderTwigTemplate('extra.twig', ['rows' => $rows]);
     }
 
     /**
@@ -85,13 +87,13 @@ class PrettyHtmlFormatter extends \Monolog\Formatter\HtmlFormatter
         // Parse stacktrace
         if (!preg_match_all('/#[\d]+ (.+): ([^\n]+)/', $message, $matches, PREG_SET_ORDER)) {
             // Simple message without stacktrace
-            return $this->renderTwigString('simple-message.twig', ['message' => $message]);
+            return $this->renderTwigTemplate('simple-message.twig', ['message' => $message]);
         }
 
         return implode('', array_map(function ($frame) {
             // Process each stacktrace line
             list(, $path, $method) = $frame;
-            return $this->renderTwigString('stacktrace-line.twig', [
+            return $this->renderTwigTemplate('stacktrace-line.twig', [
                 'method' => $this->colorMethodSyntax($method),
                 'path'   => $path
             ]);
@@ -110,6 +112,18 @@ class PrettyHtmlFormatter extends \Monolog\Formatter\HtmlFormatter
         return str_replace('&lt;?php&nbsp;', '',
             highlight_string('<?php ' . $method, true)
         );
+    }
+
+    /**
+     * Set Twig environment
+     * @param \Twig_Environment $twigEnvironment
+     * @return PrettyHtmlFormatter
+     */
+    public function setTwigEnvironment(\Twig_Environment $twigEnvironment)
+    {
+        $this->twig = $twigEnvironment;
+        $this->twig->setLoader(new \Twig_Loader_Filesystem(__DIR__ . '/twig'));
+        return $this;
     }
 
 }
