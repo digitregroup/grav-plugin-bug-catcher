@@ -94,7 +94,7 @@ class BugCatcherPlugin extends Plugin
                 )
                 ->setFrom($emailConfig['from'])
                 ->setTo($emailConfig['to']));
-        });
+        }, $emailConfig['error_level']);
     }
 
     /**
@@ -123,7 +123,7 @@ class BugCatcherPlugin extends Plugin
             $config['icon_emoji'],
             $config['use_short_attachment'],
             $config['include_context_and_extra'],
-            $config['level']
+            $config['error_level']
         );
     }
 }

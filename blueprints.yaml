@@ -3,13 +3,23 @@ version: 0.1.0
 description: Catch errors and get notifications via Email or Slack
 icon: bug
 author:
-  name: Digital Factory
+  name: DigitRE Group
   email: julien.bouisset@digitregroup.com
 homepage: https://github.com/digital-factory/grav-plugin-bug-catcher
 keywords: grav, plugin, bug, error, monolog
 bugs: https://github.com/digital-factory/grav-plugin-bug-catcher/issues
 docs: https://github.com/digital-factory/grav-plugin-bug-catcher/blob/develop/README.md
 license: MIT
+
+error_levels: &error_levels
+  100: DEBUG - Detailed debug information
+  200: INFO - Interesting events (User logs in, SQL logs)
+  250: NOTICE - Uncommon events
+  300: WARNING - Exceptional occurrences that are not errors (Use of deprecated APIs, poor use of an API, undesirable things that are not necessarily wrong)
+  400: ERROR - Runtime errors
+  500: CRITICAL - Critical conditions (Application component unavailable, unexpected exception)
+  550: ALERT - Action must be taken immediately (Entire website down, database unavailable, etc. This should trigger the SMS alerts and wake you up)
+  600: EMERGENCY - Urgent alert
 
 form:
   validation: strict
@@ -41,6 +51,12 @@ form:
             0: Disabled
           validate:
             type: bool
+        .error_level:
+          type: select
+          size: long
+          label: Minimum error level
+          options:
+            <<: *error_levels
         .subject:
           type: text
           label: Subject
@@ -80,6 +96,12 @@ form:
             0: Disabled
           validate:
             type: bool
+        .error_level:
+          type: select
+          size: long
+          label: Minimum error level
+          options:
+            <<: *error_levels
         .url:
           type: text
           label: Slack integration URL
