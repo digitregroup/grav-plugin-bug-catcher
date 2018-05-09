@@ -1,0 +1,143 @@
+name: Bug Catcher
+version: 0.1.0
+description: Catch errors and get notifications via Email or Slack
+icon: bug
+author:
+  name: DigitRE Group
+  email: julien.bouisset@digitregroup.com
+homepage: https://github.com/digital-factory/grav-plugin-bug-catcher
+keywords: grav, plugin, bug, error, monolog
+bugs: https://github.com/digital-factory/grav-plugin-bug-catcher/issues
+docs: https://github.com/digital-factory/grav-plugin-bug-catcher/blob/develop/README.md
+license: MIT
+
+error_levels: &error_levels
+  100: DEBUG - Detailed debug information
+  200: INFO - Interesting events (User logs in, SQL logs)
+  250: NOTICE - Uncommon events
+  300: WARNING - Exceptional occurrences that are not errors (Use of deprecated APIs, poor use of an API, undesirable things that are not necessarily wrong)
+  400: ERROR - Runtime errors
+  500: CRITICAL - Critical conditions (Application component unavailable, unexpected exception)
+  550: ALERT - Action must be taken immediately (Entire website down, database unavailable, etc. This should trigger the SMS alerts and wake you up)
+  600: EMERGENCY - Urgent alert
+
+form:
+  validation: strict
+  fields:
+    enabled:
+      type: toggle
+      label: Plugin status
+      highlight: 1
+      default: 0
+      options:
+        1: Enabled
+        0: Disabled
+      validate:
+        type: bool
+
+    grav-email-handlers:
+      name: grav-email-handlers
+      type: list
+      label: Grav Email Handlers
+      style: vertical
+      fields:
+        .enabled:
+          type: toggle
+          label: Handler status
+          highlight: 1
+          default: 1
+          options:
+            1: Enabled
+            0: Disabled
+          validate:
+            type: bool
+        .error_level:
+          type: select
+          size: long
+          label: Minimum error level
+          options:
+            <<: *error_levels
+        .subject:
+          type: text
+          label: Subject
+          default: New error
+        .from:
+          type: text
+          label: From / sender e-mail address
+          placeholder: bugs@website.com
+        .to:
+          type: text
+          label: To / recipient e-mail address
+          placeholder: you@website.com
+        .deduplicate:
+          type: toggle
+          label: Remove duplicates
+          highlight: 1
+          default: 1
+          options:
+            1: Enabled
+            0: Disabled
+          validate:
+            type: bool
+
+    slack-handlers:
+      name: slack-handlers
+      type: list
+      label: Slack Handlers
+      style: vertical
+      fields:
+        .enabled:
+          type: toggle
+          label: Handler status
+          highlight: 1
+          default: 1
+          options:
+            1: Enabled
+            0: Disabled
+          validate:
+            type: bool
+        .error_level:
+          type: select
+          size: long
+          label: Minimum error level
+          options:
+            <<: *error_levels
+        .url:
+          type: text
+          label: Slack integration URL
+          default: https://hooks.slack.com/services/_________/_________/________________________
+          placeholder: https://hooks.slack.com/services/_________/_________/________________________
+        .channel:
+          type: text
+          label: Slack channel
+          default: '#random'
+        .use_short_attachment:
+          type: toggle
+          label: Use short attachment
+          highlight: 1
+          default: 1
+          options:
+            1: Enabled
+            0: Disabled
+          validate:
+            type: bool
+        .include_context_and_extra:
+          type: toggle
+          label: Include context and extra
+          highlight: 1
+          default: 1
+          options:
+            1: Enabled
+            0: Disabled
+          validate:
+            type: bool
+        .deduplicate:
+          type: toggle
+          label: Remove duplicates
+          highlight: 1
+          default: 1
+          options:
+            1: Enabled
+            0: Disabled
+          validate:
+            type: bool
